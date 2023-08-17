@@ -1,14 +1,16 @@
 from fastapi import APIRouter, Depends
-from libs.services.database_operations import DatabaseOperationsService
-from libs.deps import get_database_operations_service
+from typing_extensions import Annotated
+from libs.services.database_operations import DatabaseOperationsService, get_database_operations_service
 
 itemsController = APIRouter(prefix='/items')
 
 @itemsController.get('/count')
-async def count(database_operations_service: DatabaseOperationsService = Depends(get_database_operations_service)):
-    database_operations_service.add(1)
-    counter: int = database_operations_service.get_counter()
+async def count(
+        database_operations_service: Annotated[DatabaseOperationsService, Depends(get_database_operations_service)],
+):
+    session = database_operations_service.get_session()
+
     return {
         'status': 'ok',
-        'counter': f'{counter} requests have been sent.'
+        'counter': f'{session} requests have been sent.'
     }
