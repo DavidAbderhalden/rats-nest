@@ -1,1 +1,0 @@
-GRANT ALL PRIVILEGES ON *.* TO 'backend-server'@'%' WITH GRANT OPTION;

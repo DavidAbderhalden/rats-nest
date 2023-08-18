@@ -10,6 +10,7 @@
 
 # this is only for the mysqld standalone daemon
 [mysqld]
+bind-address = ::
 
 #
 # * Basic Settings
@@ -26,8 +27,8 @@ skip-external-locking
 
 # Instead of skip-networking the default is now to listen only on
 # localhost which is more compatible and is not less secure.
-#bind-address            = 127.0.0.1
-bind-address            = 0.0.0.0
+# bind-address            = 127.0.0.1
+# bind-address            = 0.0.0.0
 
 #
 # * Fine Tuning
@@ -71,7 +72,7 @@ log_error = /var/log/mysql/error.log
 #
 # The following can be used as easy to replay backup logs or for replication.
 # note: if you are setting up a replication slave, see README.Debian about
-#       other cls you may need to change.
+#       other settings you may need to change.
 #server-id              = 1
 #log_bin                        = /var/log/mysql/mysql-bin.log
 expire_logs_days        = 10

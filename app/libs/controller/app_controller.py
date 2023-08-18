@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing_extensions import Annotated
-from libs.controller.items_controller import itemsController
-from libs.environments.settings import Base, get_app_settings
+from app.libs.controller.items_controller import itemsController
+from app.libs.environments.settings import Settings, get_app_settings
 
 appController = APIRouter(prefix='/api/v1')
 appController.include_router(itemsController)
@@ -15,7 +15,7 @@ async def hello(username: str):
 
 @appController.get('/settings')
 async def hello(
-    settings: Annotated[Base, Depends(get_app_settings)]
+    settings: Annotated[Settings, Depends(get_app_settings)]
 ):
     return {
         'status': 'ok',

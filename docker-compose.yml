@@ -1,0 +1,28 @@
+version: "3"
+services:
+  mysql:
+    container_name: mysql
+    platform: linux/x86_64
+    build: ./source/
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./source/init:/docker-entrypoint-initdb.d
+      - ./source/conf.d:/etc/mysql/conf.d
+    env_file:
+      - ./source/.env
+    tty: true
+  api:
+    depends_on:
+      - mysql
+    container_name: fast_api
+    platform: linux/x86_64
+    build: ./app/
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ./app:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - ./app/.env
