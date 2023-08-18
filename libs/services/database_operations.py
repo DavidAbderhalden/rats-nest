@@ -7,19 +7,18 @@ from functools import lru_cache
 class DatabaseOperationsService:
     _engine: Engine
     _settings: Base = Base()
+    _SessionLocal: sessionmaker
+    Base: declarative_base = declarative_base()
 
     def __init__(self) -> None:
         source_uri: str = DatabaseOperationsService._create_source_uri()
         self._engine = create_engine(source_uri)
-        self._session = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
-
-    def get_session(self):
-        return self._session
+        self._SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self._engine)
 
     @classmethod
     def _create_source_uri(cls) -> str:
         return (
-            f'mariadb+pymysql://'
+            f'mysql+pymysql://'
             f'{DatabaseOperationsService._settings.DATABASE_USER}:'
             f'{DatabaseOperationsService._settings.DATABASE_PASSWORD}@'
             f'{DatabaseOperationsService._settings.DATABASE_HOST}:'
