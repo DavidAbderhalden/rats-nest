@@ -1,5 +1,4 @@
 from pydantic import Field
-from functools import lru_cache
 from pydantic_settings import BaseSettings
 import pymysql
 
@@ -12,6 +11,4 @@ class Settings(BaseSettings):
     DATABASE_PORT: int | None = Field(3306, env='DATABASE_PORT')
     DATABASE_NAME: str | None = Field('database_name', env='DATABASE_NAME')
 
-@lru_cache
-def get_app_settings() -> Settings:
-    return Settings()
+settings = Settings()

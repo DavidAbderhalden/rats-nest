@@ -1,9 +1,11 @@
 from enum import StrEnum
 from sqlalchemy import Column, ForeignKey, VARCHAR, INT, DATE, TIMESTAMP, func
 from sqlalchemy.orm import relationship, Relationship
-from app.libs.services.database_operations import DatabaseOperationsService
+from app.libs.services.database_operations import databaseOperationsService
 from app.libs.utils.database_util import SQLStrEnum
 
+# TODO: New version of modeling syntax
+# TODO: Use the 'alembic' lib for data migration
 
 class Roles(StrEnum):
     SUPER_ADMIN: str = 'super_admin'
@@ -12,8 +14,15 @@ class Roles(StrEnum):
     USER: str = 'user'
 
 
-class CustomersModel(DatabaseOperationsService.BaseModel):
+class TestModel(databaseOperationsService.BaseModel):
+    __tablename__: str = 'test'
+    __allow_unmapped__ = True
+
+    id: Column = Column(INT, primary_key=True, index=True, autoincrement=True, unique=True, nullable=False)
+
+class CustomersModel(databaseOperationsService.BaseModel):
     __tablename__: str = 'customers'
+    __allow_unmapped__ = True
 
     # columns
     customer_id: Column = Column(INT, primary_key=True, index=True, autoincrement=True, unique=True, nullable=False)
@@ -36,9 +45,9 @@ class CustomersModel(DatabaseOperationsService.BaseModel):
     def __init__(self, **kwargs):
         super(CustomersModel, self).__init__(**kwargs)
 
-
-class LookupCustomerBillingsModel(DatabaseOperationsService.BaseModel):
+class LookupCustomerBillingsModel(databaseOperationsService.BaseModel):
     __tablename__: str = 'lookup_customer_billings'
+    __allow_unmapped__ = True
 
     # columns
     customer_id: Column = Column(
@@ -61,8 +70,9 @@ class LookupCustomerBillingsModel(DatabaseOperationsService.BaseModel):
         super(LookupCustomerBillingsModel, self).__init__(**kwargs)
 
 
-class BillingProfilesModel(DatabaseOperationsService.BaseModel):
+class BillingProfilesModel(databaseOperationsService.BaseModel):
     __tablename__ = 'billing_profiles'
+    __allow_unmapped__ = True
 
     # columns
     billing_profile_id: Column = Column(INT, primary_key=True, index=True, autoincrement=True, unique=True, nullable=False)

@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends
-from typing_extensions import Annotated
+from typing import Any
+from fastapi import APIRouter
 from app.libs.controller.items_controller import itemsController
-from app.libs.environments.settings import Settings, get_app_settings
+from app.libs.environments.settings import settings
 
 appController = APIRouter(prefix='/api/v1')
 appController.include_router(itemsController)
@@ -14,9 +14,7 @@ async def hello(username: str):
     }
 
 @appController.get('/settings')
-async def hello(
-    settings: Annotated[Settings, Depends(get_app_settings)]
-):
+async def hello() -> dict[str, Any]:
     return {
         'status': 'ok',
         'username': settings.DATABASE_USER,
