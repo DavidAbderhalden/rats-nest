@@ -3,7 +3,7 @@ from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm import Session, sessionmaker, scoped_session
 from sqlalchemy.engine import URL, Engine, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from app.libs.environments.settings import Settings
+from app.environments.settings import Settings
 from typing import Callable
 
 class DatabaseOperationsService:

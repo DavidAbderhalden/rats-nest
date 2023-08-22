@@ -31,7 +31,7 @@ docker build -t rats-nest-db:latest . --no-cache
 
 Once the build process is finished you can start your MariaDB container using the command:
 ```bash
-docker run -p 8888:3306 --env-file <path-to-env-file> -d rats-nest-db:latest
+docker run -p 3306:3306 --env-file <path-to-env-file> -d rats-nest-db:latest
 ```
 For the `<path-to-env-file>` you will need to provide a valid environment file. It should contain the following
 attributes:

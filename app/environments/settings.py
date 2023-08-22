@@ -1,8 +1,5 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings
-import pymysql
-
-pymysql.install_as_MySQLdb()
 
 class Settings(BaseSettings):
     DATABASE_USER: str | None = Field('database_username', env='DATABASE_USER')

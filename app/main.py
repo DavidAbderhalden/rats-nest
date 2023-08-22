@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request
-from app.libs.utils.app_exception_handler import AppExceptionHandler
-from app.libs.controller.app_controller import appController
-from app.libs.services.database_operations import databaseOperationsService
-from app.libs.models.database_models import TestModel
+from app.utils import AppExceptionHandler
+from app.controller import appController
+from app.services import databaseOperationsService
+from app.models import TestModel
 from typing import Any
 
 app = FastAPI()

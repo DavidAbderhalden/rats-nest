@@ -1,7 +1,7 @@
 from typing import Any
 from fastapi import APIRouter
-from app.libs.controller.items_controller import itemsController
-from app.libs.environments.settings import settings
+from app.controller.libs import itemsController
+from app.environments import settings
 
 appController = APIRouter(prefix='/api/v1')
 appController.include_router(itemsController)
