@@ -1,9 +1,12 @@
+"""Core module of the application used to initialize it"""
+from typing import Any
+
 from fastapi import FastAPI, Request
+
 from app.utils import AppExceptionHandler
 from app.controller import appController
 from app.services import databaseOperationsService
 from app.models import TestModel
-from typing import Any
 
 app = FastAPI()
 

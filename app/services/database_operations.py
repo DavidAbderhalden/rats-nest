@@ -1,9 +1,13 @@
+"""Service used for all database related operations"""
+from typing import Callable
+
 from contextlib import AbstractContextManager, contextmanager
+
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm import Session, sessionmaker, scoped_session
 from sqlalchemy.engine import URL, Engine, create_engine
+
 from app.environments.settings import Settings
-from typing import Callable
 
 class DatabaseOperationsService:
     _source_uri: URL
@@ -13,7 +17,8 @@ class DatabaseOperationsService:
 
     def __init__(self) -> None:
         self._source_uri: URL = self._create_source_uri()
-        self._engine = create_engine(self._source_uri, pool_pre_ping=True, pool_recycle=90, pool_size=10, poolclass=QueuePool)
+        self._engine = \
+            create_engine(self._source_uri, pool_pre_ping=True, pool_recycle=90, pool_size=10, poolclass=QueuePool)
         self._session_factory = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=self._engine))
 
     @classmethod

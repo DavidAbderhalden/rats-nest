@@ -1,3 +1,4 @@
+"""Handling incoming requests with invalid payload"""
 from fastapi import Request
 
 class AppExceptionHandler(Exception):

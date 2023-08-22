@@ -1,3 +1,4 @@
+"""The items endpoints controller"""
 from fastapi import APIRouter
 
 itemsController = APIRouter(prefix='/items')
