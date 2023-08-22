@@ -6,13 +6,14 @@ from app.environments.settings import Settings
 from typing import Callable
 
 class DatabaseOperationsService:
+    _source_uri: URL
     _engine: Engine
     _settings: Settings = Settings()
     _session_factory: scoped_session
 
     def __init__(self) -> None:
-        source_uri: URL = self._create_source_uri()
-        self._engine = create_engine(source_uri, pool_pre_ping=True, pool_recycle=90, pool_size=10, poolclass=QueuePool)
+        self._source_uri: URL = self._create_source_uri()
+        self._engine = create_engine(self._source_uri, pool_pre_ping=True, pool_recycle=90, pool_size=10, poolclass=QueuePool)
         self._session_factory = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=self._engine))
 
     @classmethod
@@ -40,5 +41,8 @@ class DatabaseOperationsService:
 
     def get_engine(self) -> Engine:
         return self._engine
+
+    def get_source_uri(self) -> URL:
+        return self._source_uri
 
 databaseOperationsService = DatabaseOperationsService()
