@@ -6,7 +6,7 @@ from fastapi import FastAPI, Request
 from app.utils import AppExceptionHandler
 from app.controller import appController
 from app.services import databaseOperationsService
-from app.models import TestModel
+from app.models import CitiesModel, Countries
 
 app = FastAPI()
 
@@ -20,8 +20,10 @@ async def app_exception_handler(request: Request) -> Any:
 
 @app.on_event('startup')
 def app_init() -> None:
+    # pylint: disable=unused-variable
     with databaseOperationsService.session() as sess:
-        test: TestModel = TestModel()
-        sess.add(test)
+        # pylint: disable=unused-variable
+        new_city: CitiesModel = CitiesModel(zip_code=8000, name='Zürich', country=Countries.CH)
+        # sess.add(new_city)
 
 app.include_router(appController)

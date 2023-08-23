@@ -7,12 +7,11 @@ from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm import Session, sessionmaker, scoped_session
 from sqlalchemy.engine import URL, Engine, create_engine
 
-from app.environments.settings import Settings
+from app.environments.settings import settings as app_settings
 
 class DatabaseOperationsService:
     _source_uri: URL
     _engine: Engine
-    _settings: Settings = Settings()
     _session_factory: scoped_session
 
     def __init__(self) -> None:
@@ -25,11 +24,11 @@ class DatabaseOperationsService:
     def _create_source_uri(cls) -> URL:
         return URL.create(
             drivername='mysql+mariadbconnector',
-            username=DatabaseOperationsService._settings.DATABASE_USER,
-            password=DatabaseOperationsService._settings.DATABASE_PASSWORD,
-            host=DatabaseOperationsService._settings.DATABASE_HOST,
-            port=DatabaseOperationsService._settings.DATABASE_PORT,
-            database=DatabaseOperationsService._settings.DATABASE_NAME
+            username=app_settings.DATABASE_USER,
+            password=app_settings.DATABASE_PASSWORD,
+            host=app_settings.DATABASE_HOST,
+            port=app_settings.DATABASE_PORT,
+            database=app_settings.DATABASE_NAME
         )
 
     @contextmanager
