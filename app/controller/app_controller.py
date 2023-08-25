@@ -3,11 +3,12 @@ from typing import Any
 
 from fastapi import APIRouter
 
-from app.controller.libs import itemsController
+from app.controller.libs import itemsController, accountsController
 from app.environments import settings as app_settings
 
 appController = APIRouter(prefix='/api/v1')
 appController.include_router(itemsController)
+appController.include_router(accountsController)
 
 @appController.get('/hello/{username}')
 async def hello(username: str):

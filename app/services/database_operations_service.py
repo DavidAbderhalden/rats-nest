@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, sessionmaker, scoped_session
 from sqlalchemy.engine import URL, Engine, create_engine
 
 from app.environments.settings import settings as app_settings
+from app.schemas import PostAccountsRegisterSchema
 
 class DatabaseOperationsService:
     _source_uri: URL
@@ -42,6 +43,18 @@ class DatabaseOperationsService:
             raise
         finally:
             session.close()
+
+    # TODO: Implement
+    def create_customer(self, customer_data: PostAccountsRegisterSchema) -> bool:
+        pass
+
+    # TODO: Implement
+    def modify_customer(self):
+        pass
+
+    # TODO: Implement
+    def delete_customer(self):
+        pass
 
     def get_engine(self) -> Engine:
         return self._engine

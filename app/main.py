@@ -23,7 +23,7 @@ def app_init() -> None:
     # pylint: disable=unused-variable
     with databaseOperationsService.session() as sess:
         # pylint: disable=unused-variable
-        new_city: CitiesModel = CitiesModel(zip_code=8000, name='Zürich', country=Countries.CH)
+        new_city: CitiesModel = CitiesModel(zip_code=5304, name='Endingen', country=Countries.CH)
         # sess.add(new_city)
 
 app.include_router(appController)

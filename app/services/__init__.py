@@ -1,2 +1,2 @@
 """All service modules"""
-from .database_operations import databaseOperationsService, DatabaseOperationsService
+from .database_operations_service import databaseOperationsService, DatabaseOperationsService
