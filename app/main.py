@@ -4,7 +4,7 @@ from typing import Any
 from fastapi import FastAPI, Request
 
 from app.utils import AppExceptionHandler
-from app.controller import appController
+from app.controller import api_v1_controller
 from app.services import databaseOperationsService
 from app.models import CitiesModel, Countries
 
@@ -26,4 +26,4 @@ def app_init() -> None:
         new_city: CitiesModel = CitiesModel(zip_code=5304, name='Endingen', country=Countries.CH)
         # sess.add(new_city)
 
-app.include_router(appController)
+app.include_router(api_v1_controller)

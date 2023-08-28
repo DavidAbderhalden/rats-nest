@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class BillingProfilesModel(BaseModel):
     # primary keys
-    billing_profile_id: Mapped[id] = \
+    id: Mapped[id] = \
         mapped_column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
 
     card_number: Mapped[int] = mapped_column(Integer)
@@ -24,7 +24,7 @@ class BillingProfilesModel(BaseModel):
     priority: Mapped[int] = mapped_column(Integer)
 
     # foreign keys
-    customer_id: Mapped[int] = mapped_column(Integer, ForeignKey('customers.customer_id'))
+    customer_id: Mapped[int] = mapped_column(Integer, ForeignKey('customers.id', ondelete='CASCADE'))
 
     # relationships
     billing_profile_customer_relationship: Mapped['CustomersModel'] = \

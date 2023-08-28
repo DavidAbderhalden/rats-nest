@@ -13,12 +13,12 @@ if TYPE_CHECKING:
 
 class StreetsModel(BaseModel):
     # primary keys
-    street_id: Mapped[int] = mapped_column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
 
     name: Mapped[str] = mapped_column(String(45))
 
     # foreign keys
-    city_id: Mapped[int] = mapped_column(Integer, ForeignKey('cities.city_id'))
+    city_id: Mapped[int] = mapped_column(Integer, ForeignKey('cities.id', ondelete='RESTRICT'))
 
     # relationships
     street_city_relationship: Mapped['CitiesModel'] = \

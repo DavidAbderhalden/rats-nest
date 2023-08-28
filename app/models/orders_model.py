@@ -1,7 +1,9 @@
 """The sqlalchemy model for orders table"""
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Integer, String, func
+from datetime import datetime
+
+from sqlalchemy import ForeignKey, Integer, String, func, DateTime
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 
 from .base_model import BaseModel
@@ -13,14 +15,14 @@ if TYPE_CHECKING:
 
 class OrdersModel(BaseModel):
     # primary keys
-    order_id: Mapped[int] = \
+    id: Mapped[int] = \
         mapped_column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
 
     additional_information: Mapped[str] = mapped_column(String(128), nullable=True)
-    order_time: Mapped[int] = mapped_column(Integer, insert_default=func.current_timestamp())
+    order_time: Mapped[datetime] = mapped_column(DateTime, insert_default=func.now())
 
     # foreign keys
-    customer_id: Mapped[int] = mapped_column(Integer, ForeignKey('customers.customer_id'))
+    customer_id: Mapped[int] = mapped_column(Integer, ForeignKey('customers.id', ondelete='CASCADE'))
 
     # relationships
     order_customer_relationship: Mapped['CustomersModel'] = \

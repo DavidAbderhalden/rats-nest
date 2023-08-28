@@ -13,14 +13,14 @@ if TYPE_CHECKING:
 
 class ManufacturersModel(BaseModel):
     # primary keys
-    manufacturer_id: Mapped[int] = \
+    id: Mapped[int] = \
         mapped_column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
 
     name: Mapped[str] = mapped_column(String(45))
     contact_email: Mapped[str] = mapped_column(String(45), nullable=True)
 
     # foreign keys
-    headquarter_address_id: Mapped[int] = mapped_column(Integer, ForeignKey('address.address_id'))
+    headquarter_address_id: Mapped[int] = mapped_column(Integer, ForeignKey('address.id', ondelete='RESTRICT'))
 
     # relationships
     manufacturer_address_relationship: Mapped['AddressModel'] = \

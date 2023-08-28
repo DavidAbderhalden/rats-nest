@@ -1,1 +1,6 @@
-from .post_accounts_register_schema import PostAccountsRegisterSchema
+"""Pydantic base models"""
+from .base_schema import BaseSchema
+from .address_schema import AddressCreate, AddressRead
+from .cities_schema import CitiesCreate, CitiesRead
+from .streets_schema import StreetsCreate, StreetsRead
+from .customers_schema import CustomersCreate, CustomersRead

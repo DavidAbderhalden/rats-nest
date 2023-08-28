@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 class CitiesModel(BaseModel):
     # primary keys
-    city_id: Mapped[int] = \
+    id: Mapped[int] = \
         mapped_column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
 
     zip_code: Mapped[int] = mapped_column(Integer, unique=True, index=True)

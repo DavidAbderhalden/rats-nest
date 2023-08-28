@@ -14,10 +14,10 @@ if TYPE_CHECKING:
 class LookupOrderProductsModel(BaseModel):
     # primary keys / foreign keys
     order_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey('orders.order_id'), primary_key=True, unique=False, autoincrement=False, index=True
+        Integer, ForeignKey('orders.id', ondelete='CASCADE'), primary_key=True, unique=False, autoincrement=False, index=True
     )
     product_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey('products.product_id'), primary_key=True, unique=False, autoincrement=False, index=True
+        Integer, ForeignKey('products.id', ondelete='CASCADE'), primary_key=True, unique=False, autoincrement=False, index=True
     )
 
     quantity: Mapped[int] = mapped_column(Integer)

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class ProductsModel(BaseModel):
     # primary keys
-    product_id: Mapped[int] = \
+    id: Mapped[int] = \
         mapped_column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
 
     in_stock: Mapped[bool] = mapped_column(Boolean, insert_default=False)
@@ -24,7 +24,7 @@ class ProductsModel(BaseModel):
     categories: Mapped[list[ProductCategories]] = mapped_column(JSON)
 
     # foreign keys
-    manufacturer_id: Mapped[int] = mapped_column(Integer, ForeignKey('manufacturers.manufacturer_id'))
+    manufacturer_id: Mapped[int] = mapped_column(Integer, ForeignKey('manufacturers.id', ondelete='RESTRICT'))
 
     # relationships
     product_manufacturer_relationship: Mapped['ManufacturersModel'] = \

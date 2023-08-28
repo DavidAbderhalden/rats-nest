@@ -3,21 +3,17 @@ from typing import Any
 
 from fastapi import APIRouter
 
-from app.controller.libs import itemsController, accountsController
+from .libs import accounts_controller
 from app.environments import settings as app_settings
 
-appController = APIRouter(prefix='/api/v1')
-appController.include_router(itemsController)
-appController.include_router(accountsController)
+api_v1_controller = APIRouter(prefix='/api/v1')
+api_v1_controller.include_router(accounts_controller)
 
-@appController.get('/hello/{username}')
+@api_v1_controller.get('/hello/{username}')
 async def hello(username: str):
-    return {
-        'status': 'ok',
-        'message': f'Hello {username}!'
-    }
+    return username
 
-@appController.get('/settings')
+@api_v1_controller.get('/settings')
 async def settings() -> dict[str, Any]:
     return {
         'status': 'ok',
