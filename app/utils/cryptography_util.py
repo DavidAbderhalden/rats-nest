@@ -1,6 +1,7 @@
 """Cryptography utility used to hash and validate etc."""
 from bcrypt import hashpw, gensalt, checkpw
 
+
 class CryptographyUtil:
     @classmethod
     def salty_hash(cls, plain_text_password: bytes) -> bytes:
