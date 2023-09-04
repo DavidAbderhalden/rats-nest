@@ -6,14 +6,11 @@ from fastapi import APIRouter
 from .libs import accounts_controller
 from app.environments import settings as app_settings
 
-api_v1_controller = APIRouter(prefix='/api/v1')
-api_v1_controller.include_router(accounts_controller)
+api_controller = APIRouter(prefix='/api/v1')
+api_controller.include_router(accounts_controller)
 
-@api_v1_controller.get('/hello/{username}')
-async def hello(username: str):
-    return username
 
-@api_v1_controller.get('/settings')
+@api_controller.get('/settings')
 async def settings() -> dict[str, Any]:
     return {
         'status': 'ok',

@@ -4,9 +4,7 @@ from typing import Any
 from fastapi import FastAPI, Request
 
 from app.utils import AppExceptionHandler
-from app.controller import api_v1_controller
-from app.services import databaseOperationsService
-from app.models import CitiesModel, Countries
+from app.controller.v1 import api_controller
 
 app = FastAPI()
 
@@ -26,4 +24,4 @@ def app_init() -> None:
     pass
 
 
-app.include_router(api_v1_controller)
+app.include_router(api_controller)

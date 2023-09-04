@@ -1,59 +1,17 @@
 """Service used for all database related operations"""
-from traceback import format_exception
-
-from functools import wraps
-
-from typing import Callable, Literal, TypeVar, TypeAlias, Generic, Union
+from typing import Callable, TypeVar, Generic
 
 from contextlib import asynccontextmanager, AbstractAsyncContextManager
-
-from pydantic import BaseModel as BaseModelPydantic
 
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.future import select
 from sqlalchemy.engine import URL
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncEngine, AsyncSession
 
 from app.environments.settings import settings as app_settings
 from app.schemas import BaseSchema
 
-# generics
-T = TypeVar('T')
 _ModelTypeT = TypeVar('_ModelTypeT')
-
-ResultNameLiteral: TypeAlias = Literal['database-success', 'database-error']
-
-
-# decorators
-def async_exception_handled(func) -> Callable:
-    @wraps(func)
-    async def wrapper_function(*args, **kwargs) -> DatabaseOperationsResult[_ModelTypeT]:
-        try:
-            model_type: _ModelTypeT = kwargs['model_type']
-            new_tuple: model_type = await func(*args, **kwargs)
-            return DatabaseOperationsSuccess(**{
-                'data': new_tuple
-            })
-        except SQLAlchemyError as db_exception:
-            return DatabaseOperationsError(**{
-                'error': ''.join(format_exception(db_exception))
-            })
-
-    return wrapper_function
-
-
-class DatabaseOperationsError(BaseModelPydantic):
-    name: ResultNameLiteral = 'database-error'
-    error: str
-
-
-class DatabaseOperationsSuccess(Generic[T], BaseModelPydantic):
-    name: ResultNameLiteral = 'database-success'
-    data: T
-
-
-DatabaseOperationsResult: Union[T] = DatabaseOperationsError | DatabaseOperationsSuccess[T]
 
 
 # TODO: Create email etc verification tables
@@ -110,7 +68,6 @@ class DatabaseOperationsService:
     def get_source_uri(self) -> URL:
         return self._source_uri
 
-    @async_exception_handled
     async def create(self, entity: BaseSchema, model_type: _ModelTypeT) -> Generic[_ModelTypeT]:
         async with self.session() as session:
             new_entry: _ModelTypeT = model_type(**entity.get_json())
@@ -119,7 +76,6 @@ class DatabaseOperationsService:
             await session.refresh(new_entry)
             return new_entry
 
-    @async_exception_handled
     async def get_or_create(self, entity: BaseSchema, model_type: _ModelTypeT) -> Generic[_ModelTypeT]:
         async with self.session() as session:
             select_statement = select(model_type).filter_by(**entity.get_json())
@@ -134,4 +90,4 @@ class DatabaseOperationsService:
             return new_entry
 
 
-databaseOperationsService = DatabaseOperationsService()
+database_operations_service = DatabaseOperationsService()

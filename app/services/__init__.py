@@ -1,8 +1,6 @@
-"""All service modules"""
-from .database_operations_service import (
-    databaseOperationsService,
-    DatabaseOperationsService,
-    DatabaseOperationsResult,
-    DatabaseOperationsError,
-    DatabaseOperationsSuccess
+from .service_interface import (
+    ServiceInterface,
+    ServiceOperationsResult,
+    ServiceOperationsSuccess,
+    ServiceOperationsError
 )
