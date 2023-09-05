@@ -1,8 +1,6 @@
 """Abstraction of application services, every service needs to implement this"""
 from abc import abstractmethod
 
-from traceback import format_exception
-
 from functools import wraps
 
 from typing import TypeVar, TypeAlias, Literal, Generic, Union, Callable, Any
@@ -10,6 +8,8 @@ from typing import TypeVar, TypeAlias, Literal, Generic, Union, Callable, Any
 from pydantic import BaseModel as BaseModelPydantic
 
 from sqlalchemy.exc import SQLAlchemyError
+
+from app.utils import ExceptionType, ExceptionMappingUtil
 
 # generics
 T = TypeVar('T')
@@ -22,7 +22,7 @@ ResultNameLiteral: TypeAlias = Literal['service-success', 'service-error']
 
 class ServiceOperationsError(BaseModelPydantic):
     name: ResultNameLiteral = 'service-error'
-    error: str
+    error_type: ExceptionType
 
 
 class ServiceOperationsSuccess(Generic[T], BaseModelPydantic):
@@ -45,7 +45,7 @@ def mappedresult(func) -> Callable:
             })
         except SQLAlchemyError as exc:
             return ServiceOperationsError(**{
-                'error': ''.join(format_exception(exc)),
+                'error_type': ExceptionMappingUtil.get_exception_type(exc),
             })
     return wrapper_function
 

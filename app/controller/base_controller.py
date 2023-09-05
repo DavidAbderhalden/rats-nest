@@ -1,11 +1,10 @@
 """The base controller provides essential controller functionality and is consumed by controllers."""
 from typing import TypeVar
 
-from starlette import status
-
 from fastapi.exceptions import HTTPException
 
 from app.services import ServiceInterface, ServiceOperationsResult, ServiceOperationsSuccess
+from app.utils import ExceptionMappingUtil
 
 _RequestTypeT = TypeVar('_RequestTypeT')
 _ResponseTypeT = TypeVar('_ResponseTypeT')
@@ -28,10 +27,9 @@ class BaseController:
             request=body, response_model=response_model
         )
         if service_operations_result.name == 'service-error':
-            # FIXME: Security issue, returns server error message. Somehow map the exceptions
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=service_operations_result.error
+                status_code=ExceptionMappingUtil.get_exception_code(service_operations_result.error_type),
+                detail=ExceptionMappingUtil.get_exception_message(service_operations_result.error_type)
             )
         return service_operations_result
 
@@ -45,9 +43,8 @@ class BaseController:
             selector=body, response_model=response_model
         )
         if service_operations_result.name == 'service-error':
-            # FIXME: Security issue, returns server error message. Somehow map the exceptions
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=service_operations_result.error
+                status_code=ExceptionMappingUtil.get_exception_code(service_operations_result.error_type),
+                detail=ExceptionMappingUtil.get_exception_message(service_operations_result.error_type)
             )
         return service_operations_result
