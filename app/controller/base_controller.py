@@ -1,36 +1,36 @@
 """The base controller provides essential controller functionality and is consumed by controllers."""
-from typing import TypeVar, Generic
+from typing import TypeVar
 
 from starlette import status
 
 from fastapi.exceptions import HTTPException
 
-from app.services import databaseOperationsService, DatabaseOperationsResult
+from app.services import ServiceInterface, ServiceOperationsResult, ServiceOperationsSuccess
 
-_SchemaTypeT = TypeVar('_SchemaTypeT')
-_ModelTypeT = TypeVar('_ModelTypeT')
+_RequestTypeT = TypeVar('_RequestTypeT')
+_ResponseTypeT = TypeVar('_ResponseTypeT')
+
 
 class BaseController:
     _provider_name: str
+    _service: ServiceInterface
 
-    def __init__(self, provider_name: str):
+    def __init__(self, service_operations: ServiceInterface, provider_name: str):
+        self._service_operations = service_operations
         self._provider_name = provider_name
 
-    def create(
+    async def create(
             self,
-            body: _SchemaTypeT,
-            _model_type: Generic[_ModelTypeT],
-            get_if_existing: bool = False
-    ) -> Generic[_ModelTypeT]:
-        if get_if_existing:
-            database_operations_result: DatabaseOperationsResult[_model_type] = \
-                databaseOperationsService.get_or_create(body, model_type=_model_type)
-        else:
-            database_operations_result: DatabaseOperationsResult[_model_type] = \
-                databaseOperationsService.create(body, model_type=_model_type)
-        if database_operations_result.name == 'database-error':
+            body: _RequestTypeT,
+            response_model: _ResponseTypeT
+    ) -> ServiceOperationsSuccess[_ResponseTypeT]:
+        service_operations_result: ServiceOperationsResult[response_model] = await self._service_operations.create(
+            request=body, response_model=response_model
+        )
+        if service_operations_result.name == 'service-error':
+            # FIXME: Security issue, returns server error message. Somehow map the exceptions
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Creation terminated due to an invalid entity, {self._provider_name}"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=service_operations_result.error
             )
-        return database_operations_result.data
+        return service_operations_result

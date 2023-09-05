@@ -10,6 +10,7 @@ from app.models import Roles
 from .libs import Email, CustomDate
 from .base_schema import BaseSchema
 
+
 class CustomersBase(BaseSchema):
     model_config = ConfigDict(title='Customers', from_attributes=True, extra='ignore')
     username: str = Field(max_length=20, examples=['NekroQuest'])
@@ -20,10 +21,12 @@ class CustomersBase(BaseSchema):
     phone_number: Optional[str] = Field(default=None, max_length=15, examples=['+41791112132'])
     birthdate: CustomDate = Field(max_length=10, examples=['18.04.2004'])
 
+
 class CustomersCreate(CustomersBase):
     password: str = Field(max_length=100, examples=['kWd0$3#s@H93_'])
     delivery_address_id: int = Field()
     home_address_id: int = Field()
+
 
 class CustomersRead(CustomersBase):
     delivery_address_id: int = Field()
