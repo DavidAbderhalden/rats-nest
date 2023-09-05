@@ -11,4 +11,5 @@ class AddressCreate(AddressBase):
     street_id: int
 
 class AddressRead(AddressBase):
+    street_id: int
     id: int = Field()

@@ -10,6 +10,11 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 
 from app.environments.settings import settings as app_settings
 from app.schemas import BaseSchema
+from app.models import (
+    AddressModel,
+    StreetsModel,
+    CitiesModel
+)
 
 _ModelTypeT = TypeVar('_ModelTypeT')
 
@@ -28,7 +33,7 @@ class DatabaseOperationsService:
             pool_recycle=90,
             pool_size=10,
             poolclass=QueuePool,
-            echo=True
+            echo=app_settings.ENVIRONMENT == 'development'
         )
         self._session_factory = async_sessionmaker(
             autocommit=False,
@@ -88,6 +93,26 @@ class DatabaseOperationsService:
             await session.flush()
             await session.refresh(new_entry)
             return new_entry
+
+    async def get_address_strings(self) -> list[str]:
+        async with self.session() as session:
+            select_statement = select(
+                AddressModel.house_number.label('house_number'),
+                StreetsModel.name.label('street_name'),
+                CitiesModel.name.label('city_name'),
+                CitiesModel.zip_code.label('zip_code'),
+                CitiesModel.country.label('country_code')
+            ).join(
+                AddressModel.address_street_relationship
+            ).join(
+                StreetsModel.street_city_relationship
+            )
+            rows = await session.execute(select_statement)
+            results = rows.mappings().all()
+            return list(
+                map(lambda x:
+                    f'{x.zip_code} {x.city_name}, {x.street_name} {x.house_number} ({x.country_code.upper()})', results)
+            )
 
 
 database_operations_service = DatabaseOperationsService()

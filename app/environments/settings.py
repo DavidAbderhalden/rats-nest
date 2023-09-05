@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     DATABASE_HOST: str | None = Field('database_host', env='DATABASE_HOST')
     DATABASE_PORT: int | None = Field(3306, env='DATABASE_PORT')
     DATABASE_NAME: str | None = Field('database_name', env='DATABASE_NAME')
+    ENVIRONMENT: str | None = Field('production', env='ENVIRONMENT')
 
 
 settings = Settings()

@@ -12,4 +12,4 @@ class StreetsCreate(StreetsBase):
 
 class StreetsRead(StreetsBase):
     city_id: int = Field()
-    street_id: int = Field()
+    id: int = Field()

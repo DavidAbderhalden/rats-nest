@@ -1,45 +1,55 @@
+"""Service for handling all account related actions"""
 from typing import Generic, TypeVar
 
 from pydantic import BaseModel as BaseModelPydantic
 
-from ..service_interface import ServiceInterface, ServiceOperationsResult, mappedresult
-
-from app.schemas.glue import CustomersGlue, AddressGlue
-from app.schemas import StreetsCreate, AddressCreate, CustomersCreate
-from app.models import CitiesModel, StreetsModel, CustomersModel, AddressModel
+from app.schemas.glue import CustomersGlueCreate, AddressGlueRead, CustomersGlueRead
+from app.schemas import CustomersCreate, CustomersRead
+from app.models import CustomersModel
 from app.repository import database_operations_service
 from app.utils import CryptographyUtil
+from .address_service import AddressService
+from ..service_interface import ServiceInterface, ServiceOperationsResult, mappedresult
 
 # generics
 _SchemaTypeT = TypeVar('_SchemaTypeT')
 _ModelTypeT = TypeVar('_ModelTypeT')
 
 
-# TODO: Implement
 class AccountsService(ServiceInterface):
     @mappedresult
     async def create(
             self,
             response_model: Generic[_SchemaTypeT],
-            request: CustomersGlue
+            request: CustomersGlueCreate
     ) -> ServiceOperationsResult[_SchemaTypeT]:
-        home_address_id: int = await AccountsService._get_address_id(request.home_address)
-        delivery_address_id: int = await AccountsService._get_address_id(request.delivery_address)
+        home_address: AddressGlueRead = await AddressService.get_or_create_address(request.home_address)
+        delivery_address: AddressGlueRead = await AddressService.get_or_create_address(request.delivery_address)
         hashed_password: bytes = CryptographyUtil.salty_hash(bytes(request.password, encoding='utf-8'))
-        return await database_operations_service.create(
+        customer: CustomersModel = await database_operations_service.create(
             entity=CustomersCreate(**{
                 **request.get_json(),
                 'password': hashed_password,
-                'delivery_address_id': delivery_address_id,
-                'home_address_id': home_address_id
+                'delivery_address_id': home_address.id,
+                'home_address_id': delivery_address.id
             }),
             model_type=CustomersModel
         )
+        return CustomersGlueRead(**{
+            **CustomersRead.model_validate(customer).get_json(),
+            'home_address': {
+                **AddressGlueRead.model_validate(home_address).get_json()
+            },
+            'delivery_address': {
+                **AddressGlueRead.model_validate(delivery_address).get_json()
+            }
+        })
 
     @mappedresult
     async def read(
             self,
-            response_model: Generic[_SchemaTypeT]
+            response_model: Generic[_SchemaTypeT],
+            selector: int
     ) -> ServiceOperationsResult[_SchemaTypeT]:
         pass
 
@@ -58,26 +68,3 @@ class AccountsService(ServiceInterface):
             request: BaseModelPydantic
     ) -> ServiceOperationsResult[_SchemaTypeT]:
         pass
-
-    @classmethod
-    async def _get_address_id(cls, address: AddressGlue) -> int:
-        city: CitiesModel = await database_operations_service.get_or_create(
-            entity=address.street.city,
-            model_type=CitiesModel
-        )
-        street: StreetsModel = await database_operations_service.get_or_create(
-            entity=StreetsCreate(**{
-                'name': address.street.name,
-                'city_id': city.id
-            }),
-            model_type=StreetsModel
-        )
-
-        address: AddressModel = await database_operations_service.get_or_create(
-            entity=AddressCreate(**{
-                'house_number': address.house_number,
-                'street_id': street.id
-            }),
-            model_type=AddressModel
-        )
-        return address.id

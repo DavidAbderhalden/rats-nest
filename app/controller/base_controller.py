@@ -34,3 +34,20 @@ class BaseController:
                 detail=service_operations_result.error
             )
         return service_operations_result
+
+
+    async def read(
+            self,
+            body: _RequestTypeT,
+            response_model: _ResponseTypeT
+    ) -> ServiceOperationsSuccess[_ResponseTypeT]:
+        service_operations_result: ServiceOperationsResult[response_model] = await self._service_operations.read(
+            selector=body, response_model=response_model
+        )
+        if service_operations_result.name == 'service-error':
+            # FIXME: Security issue, returns server error message. Somehow map the exceptions
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=service_operations_result.error
+            )
+        return service_operations_result

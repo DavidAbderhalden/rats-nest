@@ -1,12 +1,15 @@
+"""Abstraction of application services, every service needs to implement this"""
 from abc import abstractmethod
 
 from traceback import format_exception
 
 from functools import wraps
 
-from typing import TypeVar, TypeAlias, Literal, Generic, Union, Callable
+from typing import TypeVar, TypeAlias, Literal, Generic, Union, Callable, Any
 
 from pydantic import BaseModel as BaseModelPydantic
+
+from sqlalchemy.exc import SQLAlchemyError
 
 # generics
 T = TypeVar('T')
@@ -35,12 +38,12 @@ def mappedresult(func) -> Callable:
     @wraps(func)
     async def wrapper_function(*args, **kwargs) -> ServiceOperationsResult[_SchemaTypeT]:
         try:
-            _ResponseModel: _SchemaTypeT = kwargs['response_model']
-            response: _ResponseModel = await func(*args, **kwargs)
+            response_model: _SchemaTypeT = kwargs['response_model']
+            response: response_model = await func(*args, **kwargs)
             return ServiceOperationsSuccess(**{
                 'data': response
             })
-        except Exception as exc:
+        except SQLAlchemyError as exc:
             return ServiceOperationsError(**{
                 'error': ''.join(format_exception(exc)),
             })
@@ -58,7 +61,9 @@ class ServiceInterface:
 
     @abstractmethod
     async def read(
-            self, response_model: Generic[_SchemaTypeT]
+            self,
+            response_model: Generic[_SchemaTypeT],
+            selector: Any
     ) -> ServiceOperationsResult[_SchemaTypeT]:
         pass
 

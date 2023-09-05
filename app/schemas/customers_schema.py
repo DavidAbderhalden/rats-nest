@@ -29,6 +29,7 @@ class CustomersCreate(CustomersBase):
 
 
 class CustomersRead(CustomersBase):
+    id: int = Field()
     delivery_address_id: int = Field()
     home_address_id: int = Field()
     role: Roles = Field(examples=[Roles.USER])
