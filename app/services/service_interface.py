@@ -9,6 +9,8 @@ from pydantic import BaseModel as BaseModelPydantic
 
 from sqlalchemy.exc import SQLAlchemyError
 
+from fastapi import BackgroundTasks
+
 from app.utils import ExceptionType, ExceptionMappingUtil
 
 # generics
@@ -38,8 +40,8 @@ def mappedresult(func) -> Callable:
     @wraps(func)
     async def wrapper_function(*args, **kwargs) -> ServiceOperationsResult[_SchemaTypeT]:
         try:
-            response_model: _SchemaTypeT = kwargs['response_model']
-            response: response_model = await func(*args, **kwargs)
+            model: _SchemaTypeT = kwargs['response_model']
+            response: model = await func(*args, **kwargs)
             return ServiceOperationsSuccess(**{
                 'data': response
             })
@@ -55,7 +57,8 @@ class ServiceInterface:
     async def create(
             self,
             response_model: Generic[_SchemaTypeT],
-            request: BaseModelPydantic
+            request: BaseModelPydantic,
+            background_task: BackgroundTasks
     ) -> ServiceOperationsResult[_SchemaTypeT]:
         pass
 

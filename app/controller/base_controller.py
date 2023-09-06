@@ -21,10 +21,11 @@ class BaseController:
     async def create(
             self,
             body: _RequestTypeT,
-            response_model: _ResponseTypeT
+            response_model: _ResponseTypeT,
+            **kwargs
     ) -> ServiceOperationsSuccess[_ResponseTypeT]:
         service_operations_result: ServiceOperationsResult[response_model] = await self._service_operations.create(
-            request=body, response_model=response_model
+            request=body, response_model=response_model, background_task=kwargs.get('background_task')
         )
         if service_operations_result.name == 'service-error':
             raise HTTPException(
@@ -37,10 +38,11 @@ class BaseController:
     async def read(
             self,
             body: _RequestTypeT,
-            response_model: _ResponseTypeT
+            response_model: _ResponseTypeT,
+            **kwargs
     ) -> ServiceOperationsSuccess[_ResponseTypeT]:
         service_operations_result: ServiceOperationsResult[response_model] = await self._service_operations.read(
-            selector=body, response_model=response_model
+            selector=body, response_model=response_model, background_task=kwargs.get('background_task')
         )
         if service_operations_result.name == 'service-error':
             raise HTTPException(

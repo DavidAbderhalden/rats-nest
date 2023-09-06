@@ -19,7 +19,6 @@ from app.models import (
 _ModelTypeT = TypeVar('_ModelTypeT')
 
 
-# TODO: Create email etc verification tables
 class DatabaseOperationsService:
     _source_uri: URL
     _engine: AsyncEngine

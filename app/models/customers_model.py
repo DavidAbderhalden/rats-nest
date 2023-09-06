@@ -17,8 +17,7 @@ if TYPE_CHECKING:
 
 class CustomersModel(BaseModel):
     # primary keys
-    id: Mapped[int] = \
-        mapped_column(primary_key=True, unique=True, autoincrement=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, autoincrement=True, index=True)
 
     username: Mapped[str] = mapped_column(String(20), unique=True, index=True)
     primary_email: Mapped[str] = mapped_column(String(45), unique=True, index=True)
@@ -44,6 +43,8 @@ class CustomersModel(BaseModel):
         relationship(back_populates='authentication_customer_relationship')
     customer_order_relationship: Mapped['OrdersModel'] = \
         relationship(back_populates='order_customer_relationship')
+    customer_confirmation_codes_relationship: Mapped['ConfirmationCodesModel'] = \
+        relationship(back_populates='confirmation_codes_customer_relationship')
     customer_delivery_address_relationship: Mapped['AddressModel'] = \
         relationship(back_populates='delivery_address_customer_relationship', foreign_keys=[delivery_address_id])
     customer_home_address_relationship: Mapped['AddressModel'] = \

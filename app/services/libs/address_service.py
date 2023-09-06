@@ -4,6 +4,7 @@ from typing import Generic, TypeVar
 from pydantic import BaseModel as BaseModelPydantic
 
 from fuzzywuzzy import fuzz
+from starlette.background import BackgroundTasks
 
 from app.repository import database_operations_service
 from app.schemas.glue import AddressGlueRead, AddressGlueCreate
@@ -24,7 +25,8 @@ class AddressService(ServiceInterface):
     async def create(
             self,
             response_model: Generic[_SchemaTypeT],
-            request: AddressGlueCreate
+            request: AddressGlueCreate,
+            background_task: BackgroundTasks = None
     ) -> ServiceOperationsResult[_SchemaTypeT]:
         return await AddressService.get_or_create_address(request)
 
@@ -47,8 +49,8 @@ class AddressService(ServiceInterface):
 
         address_strings: list[str] = await database_operations_service.get_address_strings()
 
-        def is_string_similar(element: str, MIN_SIMILARITY_PERCENTAGE: int = 80) -> bool:
-            return fuzz.WRatio(element, selector.address) >= MIN_SIMILARITY_PERCENTAGE
+        def is_string_similar(element: str, min_similarity_percentage: int = 80) -> bool:
+            return fuzz.WRatio(element, selector.address) >= min_similarity_percentage
 
         fuzzy_address_strings: list[str] = sorted(
             (address for address in address_strings if is_string_similar(address)),

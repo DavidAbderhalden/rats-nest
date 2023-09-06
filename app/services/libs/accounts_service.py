@@ -3,12 +3,17 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel as BaseModelPydantic
 
+from fastapi import BackgroundTasks
+
+from fastapi_mail import MessageSchema
+
 from app.schemas.glue import CustomersGlueCreate, AddressGlueRead, CustomersGlueRead
-from app.schemas import CustomersCreate, CustomersRead
-from app.models import CustomersModel
+from app.schemas import CustomersCreate, CustomersRead, ConfirmationCodesCreate
+from app.models import CustomersModel, ConfirmationCodesModel
 from app.repository import database_operations_service
-from app.utils import CryptographyUtil
+from app.utils import CryptographyUtil, StringTransformationUtil
 from .address_service import AddressService
+from ..email_service import emailService
 from ..service_interface import ServiceInterface, ServiceOperationsResult, mappedresult
 
 # generics
@@ -21,7 +26,8 @@ class AccountsService(ServiceInterface):
     async def create(
             self,
             response_model: Generic[_SchemaTypeT],
-            request: CustomersGlueCreate
+            request: CustomersGlueCreate,
+            background_task: BackgroundTasks,
     ) -> ServiceOperationsResult[_SchemaTypeT]:
         home_address: AddressGlueRead = await AddressService.get_or_create_address(request.home_address)
         delivery_address: AddressGlueRead = await AddressService.get_or_create_address(request.delivery_address)
@@ -35,6 +41,14 @@ class AccountsService(ServiceInterface):
             }),
             model_type=CustomersModel
         )
+        email_validation_code: str = await AccountsService._create_email_validation_code(customer.id)
+        # do I want to send the email to both addresses?
+        verification_mail: MessageSchema = emailService.create_email_verification_mail(
+            recipients=[customer.primary_email],
+            verification_code=email_validation_code,
+            username=customer.username
+        )
+        emailService.send(background_task=background_task, message=verification_mail)
         return CustomersGlueRead(**{
             **CustomersRead.model_validate(customer).get_json(),
             'home_address': {
@@ -68,3 +82,17 @@ class AccountsService(ServiceInterface):
             request: BaseModelPydantic
     ) -> ServiceOperationsResult[_SchemaTypeT]:
         pass
+
+    @classmethod
+    async def _create_email_validation_code(cls, customer_id: int) -> str:
+        random_code: str = StringTransformationUtil.create_random_code(
+            length=20, upper_case=True, lower_case=True, digits=True, specials=True
+        )
+        confirmation_codes_create: ConfirmationCodesCreate = ConfirmationCodesCreate(**{
+            'email_validation': random_code,
+            'customer_id': customer_id
+        })
+        confirmation_codes: ConfirmationCodesModel = await database_operations_service.create(
+            confirmation_codes_create, model_type=ConfirmationCodesModel
+        )
+        return confirmation_codes.email_validation

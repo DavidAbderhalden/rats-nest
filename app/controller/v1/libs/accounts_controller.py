@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks
 
 from typing import Type
 
@@ -13,7 +13,7 @@ base_controller: BaseController = BaseController(service_operations=AccountsServ
 
 
 @accounts_controller.post('/register', response_model=CustomersGlueRead)
-async def register(body: CustomersGlueCreate):
+async def register(body: CustomersGlueCreate, background_task: BackgroundTasks):
     service_success: ServiceOperationsSuccess[Type[CustomersGlueRead]] = \
-        await base_controller.create(body, response_model=CustomersGlueRead)
+        await base_controller.create(body=body, response_model=CustomersGlueRead, background_task=background_task)
     return service_success.data
