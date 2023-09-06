@@ -14,6 +14,10 @@ from ..service_interface import ServiceInterface, ServiceOperationsResult, mappe
 # generics
 _SchemaTypeT = TypeVar('_SchemaTypeT')
 
+class SearchAddressQueryParams(BaseModelPydantic):
+    address: str
+    limit: int
+
 
 class AddressService(ServiceInterface):
     @mappedresult
@@ -38,14 +42,20 @@ class AddressService(ServiceInterface):
     async def read(
             self,
             response_model: Generic[_SchemaTypeT],
-            selector: str
+            selector: SearchAddressQueryParams
     ) -> ServiceOperationsResult[_SchemaTypeT]:
-        min_similarity_percentage: int = 70
+
         address_strings: list[str] = await database_operations_service.get_address_strings()
-        fuzzy_address_strings: list[str] = [
-            string for string in address_strings if fuzz.WRatio(string, selector) > min_similarity_percentage
-        ]
-        return fuzzy_address_strings
+
+        def is_string_similar(element: str, MIN_SIMILARITY_PERCENTAGE: int = 80) -> bool:
+            return fuzz.WRatio(element, selector.address) >= MIN_SIMILARITY_PERCENTAGE
+
+        fuzzy_address_strings: list[str] = sorted(
+            (address for address in address_strings if is_string_similar(address)),
+            key=is_string_similar
+        )
+        print(fuzzy_address_strings)
+        return fuzzy_address_strings[:selector.limit]
 
     @classmethod
     async def get_or_create_address(cls, address_glue: AddressGlueCreate) -> AddressGlueRead:
