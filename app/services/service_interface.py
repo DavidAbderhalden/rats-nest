@@ -12,6 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from fastapi import BackgroundTasks
 
 from app.utils import ExceptionType, ExceptionMappingUtil
+from app.exceptions import RatsNestError
 
 # generics
 T = TypeVar('T')
@@ -45,7 +46,7 @@ def mappedresult(func) -> Callable:
             return ServiceOperationsSuccess(**{
                 'data': response
             })
-        except SQLAlchemyError as exc:
+        except (SQLAlchemyError, RatsNestError) as exc:
             return ServiceOperationsError(**{
                 'error_type': ExceptionMappingUtil.get_exception_type(exc),
             })

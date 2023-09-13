@@ -1,12 +1,14 @@
 """Database enumerations"""
-from enum import StrEnum
+from enum import IntEnum, StrEnum
 
-class Roles(StrEnum):
-    SUPER_ADMIN: str = 'super_admin'
-    ADMIN: str = 'admin'
-    SUPER_USER: str = 'super_user'
-    USER: str = 'user'
+class Roles(IntEnum):
+    SUPER_ADMIN: str = 3
+    ADMIN: str = 2
+    SUPER_USER: str = 1
+    USER: str = 0
 
+    def superior_or_equal(self, base_role: IntEnum):
+        return self.value >= base_role.value
 
 class ProductCategories(StrEnum):
     RODENT: str = 'rodent'

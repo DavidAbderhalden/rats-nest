@@ -46,7 +46,7 @@ class VerificationService(ServiceInterface):
             password_reset=urlsafe_b64decode(
                 bytes(request.password_reset, 'ascii')).decode('utf8') if request.password_reset else None
         )
-        return await database_operations_service.delete_attributes_if_existent(
+        return await database_operations_service.delete_attributes_or_throw(
             entity=reconstructed_codes, model_type=ConfirmationCodesModel
         )
 

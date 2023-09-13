@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     MAIL_USE_CREDENTIALS: bool = Field('yes', env='MAIL_USE_CREDENTIALS')
     MAIL_VALIDATE_CERTS: bool = Field('yes', env='MAIL_VALIDATE_CERTS')
     RATS_NEST_DOMAIN: str = Field('localhost:8000', env='RATS_NEST_DOMAIN')
+    JWT_SECRET_KEY: str = Field('secret_key', env='JWT_SECRET_KEY')
 
 
 settings = Settings()

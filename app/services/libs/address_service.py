@@ -57,7 +57,6 @@ class AddressService(ServiceInterface):
             (address for address in address_strings if is_string_similar(address)),
             key=is_string_similar
         )
-        print(fuzzy_address_strings)
         return fuzzy_address_strings[:selector.limit]
 
     @classmethod

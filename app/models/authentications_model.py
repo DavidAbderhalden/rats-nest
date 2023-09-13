@@ -14,12 +14,14 @@ if TYPE_CHECKING:
 
 class AuthenticationsModel(BaseModel):
     # primary keys
+    # TODO: Should be unique token instead of integer
     id: Mapped[int] = \
         mapped_column(Integer, primary_key=True, unique=True, autoincrement=True, index=True)
 
+    # 36 is max length of uuid (32x characters 4x "-")
+    auth_token: Mapped[str] = mapped_column(String(36), unique=True, nullable=False)
     issued_at_time: Mapped[datetime] = mapped_column(DateTime, insert_default=func.now())
     host_name: Mapped[str] = mapped_column(String(45))
-    ip_address: Mapped[str] = mapped_column(String(15))
 
     # foreign keys
     customer_id: Mapped[int] = mapped_column(Integer, ForeignKey('customers.id', ondelete='CASCADE'))

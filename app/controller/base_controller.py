@@ -29,7 +29,6 @@ class BaseController:
         )
         return self._raise_errors(service_operations_result)
 
-
     async def read(
             self,
             body: _RequestTypeT,
@@ -46,7 +45,17 @@ class BaseController:
             response_model: _ResponseTypeT
     ) -> ServiceOperationsSuccess[_ResponseTypeT]:
         service_operations_result: ServiceOperationsResult[response_model] = await self._service_operations.update(
-            request=body, response_model=response_model
+                request=body, response_model=response_model
+        )
+        return self._raise_errors(service_operations_result)
+
+    async def delete(
+            self,
+            body: _RequestTypeT,
+            response_model: _ResponseTypeT
+    ) -> ServiceOperationsSuccess[_ResponseTypeT]:
+        service_operations_result: ServiceOperationsResult[response_model] = await self._service_operations.delete(
+                request=body, response_model=response_model
         )
         return self._raise_errors(service_operations_result)
 
