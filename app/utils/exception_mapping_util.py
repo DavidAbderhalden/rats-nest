@@ -5,6 +5,7 @@ from enum import StrEnum
 class ExceptionType(StrEnum):
     INTEGRITY_ERROR: str = 'IntegrityError'
     UNKNOWN_ERROR: str = 'UnknownError'
+    NO_RESULT_FOUND: str = 'NoResultFound'
 
 class ExceptionMapEntry:
     exception_code: int
@@ -18,6 +19,7 @@ class ExceptionMappingUtil:
     exceptions_map: dict[ExceptionType, ExceptionMapEntry] = {
         ExceptionType.INTEGRITY_ERROR: ExceptionMapEntry(exc_code=400, exc_msg='Already exists'),
         ExceptionType.UNKNOWN_ERROR: ExceptionMapEntry(exc_code=500, exc_msg='An unexpected error occurred'),
+        ExceptionType.NO_RESULT_FOUND: ExceptionMapEntry(exc_code=404, exc_msg='No data found'),
     }
 
     @classmethod
@@ -34,5 +36,5 @@ class ExceptionMappingUtil:
         try:
             exception_type: ExceptionType = ExceptionType(exception_type_string)
             return exception_type
-        except AttributeError:
+        except (ValueError, AttributeError):
             return ExceptionType.UNKNOWN_ERROR

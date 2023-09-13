@@ -1,4 +1,6 @@
 """Service for handling all account related actions"""
+from base64 import urlsafe_b64encode
+
 from typing import Generic, TypeVar
 
 from pydantic import BaseModel as BaseModelPydantic
@@ -45,7 +47,7 @@ class AccountsService(ServiceInterface):
         # do I want to send the email to both addresses?
         verification_mail: MessageSchema = emailService.create_email_verification_mail(
             recipients=[customer.primary_email],
-            verification_code=email_validation_code,
+            verification_code=urlsafe_b64encode(bytes(email_validation_code, 'utf8')).decode('ascii'),
             username=customer.username
         )
         emailService.send(background_task=background_task, message=verification_mail)

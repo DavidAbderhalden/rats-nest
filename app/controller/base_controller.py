@@ -27,23 +27,34 @@ class BaseController:
         service_operations_result: ServiceOperationsResult[response_model] = await self._service_operations.create(
             request=body, response_model=response_model, background_task=kwargs.get('background_task')
         )
-        if service_operations_result.name == 'service-error':
-            raise HTTPException(
-                status_code=ExceptionMappingUtil.get_exception_code(service_operations_result.error_type),
-                detail=ExceptionMappingUtil.get_exception_message(service_operations_result.error_type)
-            )
-        return service_operations_result
+        return self._raise_errors(service_operations_result)
 
 
     async def read(
             self,
             body: _RequestTypeT,
             response_model: _ResponseTypeT,
-            **kwargs
     ) -> ServiceOperationsSuccess[_ResponseTypeT]:
         service_operations_result: ServiceOperationsResult[response_model] = await self._service_operations.read(
-            selector=body, response_model=response_model, background_task=kwargs.get('background_task')
+            selector=body, response_model=response_model
         )
+        return self._raise_errors(service_operations_result)
+
+    async def update(
+            self,
+            body: _RequestTypeT,
+            response_model: _ResponseTypeT
+    ) -> ServiceOperationsSuccess[_ResponseTypeT]:
+        service_operations_result: ServiceOperationsResult[response_model] = await self._service_operations.update(
+            request=body, response_model=response_model
+        )
+        return self._raise_errors(service_operations_result)
+
+    @classmethod
+    def _raise_errors(
+            cls,
+            service_operations_result: ServiceOperationsResult[_ResponseTypeT]
+    ) -> ServiceOperationsSuccess[_ResponseTypeT]:
         if service_operations_result.name == 'service-error':
             raise HTTPException(
                 status_code=ExceptionMappingUtil.get_exception_code(service_operations_result.error_type),

@@ -15,6 +15,7 @@ from ..service_interface import ServiceInterface, ServiceOperationsResult, mappe
 # generics
 _SchemaTypeT = TypeVar('_SchemaTypeT')
 
+# TODO: Probably needs outsourcing
 class SearchAddressQueryParams(BaseModelPydantic):
     address: str
     limit: int

@@ -30,8 +30,7 @@ class Settings(BaseSettings):
     MAIL_SSL_TLS: bool = Field('yes', env='MAIL_SSL_TLS')
     MAIL_USE_CREDENTIALS: bool = Field('yes', env='MAIL_USE_CREDENTIALS')
     MAIL_VALIDATE_CERTS: bool = Field('yes', env='MAIL_VALIDATE_CERTS')
-    # FIXME: host name
-    HOST_NAME: str = Field('localhost:8000')
+    RATS_NEST_DOMAIN: str = Field('localhost:8000', env='RATS_NEST_DOMAIN')
 
 
 settings = Settings()

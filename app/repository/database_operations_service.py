@@ -1,8 +1,9 @@
 """Service used for all database related operations"""
-from typing import Callable, TypeVar, Generic
+from typing import Callable, TypeVar, Generic, Any
 
 from contextlib import asynccontextmanager, AbstractAsyncContextManager
 
+from sqlalchemy import ScalarResult
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.future import select
 from sqlalchemy.engine import URL
@@ -83,8 +84,8 @@ class DatabaseOperationsService:
     async def get_or_create(self, entity: BaseSchema, model_type: _ModelTypeT) -> Generic[_ModelTypeT]:
         async with self.session() as session:
             select_statement = select(model_type).filter_by(**entity.get_json())
-            existing_entry: model_type | None = await session.scalars(select_statement)
-            first_entry = existing_entry.first()
+            existing_entry: ScalarResult[model_type] = await session.scalars(select_statement)
+            first_entry: model_type | None = existing_entry.first()
             if first_entry:
                 return first_entry
             new_entry: _ModelTypeT = model_type(**entity.get_json())
@@ -92,6 +93,22 @@ class DatabaseOperationsService:
             await session.flush()
             await session.refresh(new_entry)
             return new_entry
+
+    """Searches for unique attribute in target table. Attribute will be set to NONE in case it exists.
+    :return ModelType if a tuple with the expected values exists. 
+    :raise NoResultFound in case no tuple with the expected values exists.
+    """
+    async def delete_attributes_if_existent(self, entity: BaseSchema, model_type: _ModelTypeT) -> Generic[_ModelTypeT]:
+        async with self.session() as session:
+            select_statement = select(model_type).filter_by(**entity.get_json())
+            existing_entry: ScalarResult[model_type] = await session.scalars(select_statement)
+            first_entry: model_type = existing_entry.one()
+            for attribute, value in entity.__dict__.items():
+                original_value: Any = getattr(first_entry, attribute)
+                setattr(first_entry, attribute, None if value else original_value)
+            await session.flush()
+            await session.refresh(first_entry)
+            return first_entry
 
     async def get_address_strings(self) -> list[str]:
         async with self.session() as session:

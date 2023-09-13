@@ -14,6 +14,7 @@ base_controller: BaseController = BaseController(service_operations=AccountsServ
 
 @accounts_controller.post('/register', response_model=CustomersGlueRead)
 async def register(body: CustomersGlueCreate, background_task: BackgroundTasks):
-    service_success: ServiceOperationsSuccess[Type[CustomersGlueRead]] = \
-        await base_controller.create(body=body, response_model=CustomersGlueRead, background_task=background_task)
+    service_success: ServiceOperationsSuccess[Type[CustomersGlueRead]] = await base_controller.create(
+        body=body, response_model=CustomersGlueRead, background_task=background_task
+    )
     return service_success.data

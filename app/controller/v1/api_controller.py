@@ -3,12 +3,13 @@ from typing import Any
 
 from fastapi import APIRouter
 
-from .libs import accounts_controller, address_controller
+from .libs import accounts_controller, address_controller, verifications_controller
 from app.environments import settings as app_settings
 
 api_controller = APIRouter(prefix='/api/v1')
 api_controller.include_router(accounts_controller)
 api_controller.include_router(address_controller)
+api_controller.include_router(verifications_controller)
 
 
 @api_controller.get('/settings')

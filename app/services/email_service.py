@@ -10,6 +10,7 @@ from jinja2 import Environment, Template
 from app.environments import settings
 from app.schemas.libs import Email
 from app import templates_environment
+from app.utils import EmailUtil
 
 
 class EmailService:
@@ -50,10 +51,15 @@ class EmailService:
             attachments=attachments
         )
 
-    def create_email_verification_mail(self, recipients: list[Email], verification_code: str, username: str) -> MessageSchema:
+    def create_email_verification_mail(
+            self,
+            recipients: list[Email],
+            verification_code: str,
+            username: str
+    ) -> MessageSchema:
         email_verification_template: Template = self._templates.get_template('email-verification-template.html.jinja')
         email_verification_html: str = email_verification_template.render({
-            'verification_url': f'http://{settings.HOST_NAME}/verify-email/{verification_code}',
+            'verification_url': f'http://{settings.RATS_NEST_DOMAIN}/verify-email/{verification_code}',
             'username': username
         })
         return self._create_mail(
@@ -61,7 +67,7 @@ class EmailService:
             recipients=recipients,
             template=email_verification_html,
             template_type=MessageType.html,
-            attachments=EmailService._load_as_image_attachments([
+            attachments=EmailUtil.load_as_image_attachments([
                 'facebook_logo.png',
                 'instagram_logo.png',
                 'linkedin_logo.png',
@@ -74,21 +80,5 @@ class EmailService:
         send_task: Callable[[MessageSchema], Coroutine] = self._fast_mail.send_message
         background_task.add_task(send_task, message=message)
 
-    @classmethod
-    def _load_as_image_attachments(cls, files: list[str]) -> list[dict]:
-        return [cls._file_to_image_attachment(file) for file in files]
-
-    @classmethod
-    def _file_to_image_attachment(cls, file: str) -> dict:
-        file_name: str = file.split('.')[0].lower()
-        file_prefix: str = file_name.split('.')[-1].lower()
-        return {
-            'file': f'{settings.MAIL_IMAGE_PATH}/{file}',
-            'headers': {
-                'Content-ID': f'<{file_name}@fastapi-mail>'
-            },
-            'mime_type': 'image',
-            'mime_subtype': file_prefix
-        }
 
 emailService: EmailService = EmailService()
